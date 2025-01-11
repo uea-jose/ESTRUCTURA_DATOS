@@ -25,7 +25,7 @@ class GestorDeAsignaturas:
 # Crear una instancia de la clase GestorDeAsignaturas
 gestor_asignaturas = GestorDeAsignaturas()
 
-# Agregar asignaturas
+# Agregar# asignaturas
 gestor_asignaturas.agregar_asignatura("Matemáticas")
 gestor_asignaturas.agregar_asignatura("Física")
 gestor_asignaturas.agregar_asignatura("Química")

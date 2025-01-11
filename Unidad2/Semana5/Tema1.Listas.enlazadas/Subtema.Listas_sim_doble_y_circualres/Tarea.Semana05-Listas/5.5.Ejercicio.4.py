@@ -38,7 +38,7 @@ class Loteria:
             else:
                 print(num, end=", ")
 
-
+#
 # Función principal
 def main():
     # Crear el objeto Loteria

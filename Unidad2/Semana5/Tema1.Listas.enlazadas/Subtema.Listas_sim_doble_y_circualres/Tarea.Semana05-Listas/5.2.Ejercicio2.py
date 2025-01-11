@@ -33,7 +33,7 @@ def main():
     gestor_asignaturas = GestorDeAsignaturas()
 
     # Ingreso de asignaturas por teclado
-    while True:
+    while True:#
         asignatura = input("Introduce una asignatura \nMatematicas\n"
                            "Fisica\n"
                            "Quimica\n"

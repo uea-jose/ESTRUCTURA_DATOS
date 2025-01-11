@@ -20,7 +20,7 @@ class GestorDeNumeros:
         for numero in reversed(self.numeros):
             print(numero, end=", " if numero != self.numeros[0] else "")
         print()  # Para saltar a la siguiente línea
-
+#
 
 # Función principal
 def main():

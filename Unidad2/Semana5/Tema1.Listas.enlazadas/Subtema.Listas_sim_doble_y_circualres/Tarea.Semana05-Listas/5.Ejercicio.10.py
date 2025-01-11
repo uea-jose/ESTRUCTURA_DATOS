@@ -27,7 +27,7 @@ class GestorDePrecios:
         # Mostrar los resultados
         print(f"El precio más bajo es: {precio_minimo}")
         print(f"El precio más alto es: {precio_maximo}")
-
+#
 
 # Función principal
 def main():
@@ -35,7 +35,7 @@ def main():
     gestor_precios = GestorDePrecios()
 
     # Mostrar la lista original de precios y los precios más bajo y más alto
-    gestor_precios.mostrar_precios()
+    gestor_precios.mostrar_precios()#
 
 
 # Llamada a la función principal
