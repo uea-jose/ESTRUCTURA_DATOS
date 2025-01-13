@@ -138,7 +138,7 @@ class TurnosClinica:
             self.hora_entry.insert(0, datos[3])
         else:
             messagebox.showwarning("Advertencia", "Por favor, seleccione un turno para modificar.")
-
+##
 # Llamar a la función principal
 if __name__ == "__main__":
     root = tk.Tk()
