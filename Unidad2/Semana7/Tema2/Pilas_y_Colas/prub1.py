@@ -45,7 +45,7 @@ class TorreHanoi:
         # Resolver el juego
         self.resolver(self.num_discos, 0, 2, 1)
 
-        # Mostrar los pasos
+        # Mostrar los pasos#
         for paso in self.pasos:
             input("Presiona Enter para ver el siguiente paso...")
             self.torres = paso  # Actualizar el estado de las torres en cada paso
