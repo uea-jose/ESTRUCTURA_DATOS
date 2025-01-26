@@ -1,10 +1,4 @@
-import math
-
-# Clase Círculo
-class Circulo:
-    def __init__(self, radio):
-        # radio es el valor de la distancia desde el centro del círculo hasta su borde
-        self.radio = radio
++
 
     def calcular_area(self):
         # calcular_area es una función que devuelve el área del círculo

@@ -91,7 +91,7 @@ class TorreHanoi:
     def juego_completo(self):
         return len(self.torres[2]) == self.num_discos and self.torres[2] == list(range(self.num_discos, 0, -1))
 
-
+#
 if __name__ == "__main__":
     juego = TorreHanoi(3)
     juego.jugar()

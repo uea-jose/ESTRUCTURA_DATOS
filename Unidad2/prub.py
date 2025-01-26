@@ -1,55 +1,93 @@
 import time
 
-# Clase que representa el juego de la Torre de Hanoi
 class TorreHanoi:
     def __init__(self, num_discos):
-        # Inicializa las torres y el número de discos
         self.num_discos = num_discos
-        # Los discos se representan con '#' y el más grande tiene más caracteres
-        self.torres = [['#' * i for i in range(num_discos, 0, -1)], [], []]
-        self.pasos = []
+        # Los discos están representados con números para facilidad visual.
+        self.torres = [[i for i in range(num_discos, 0, -1)], [], []]  # Torre A tiene los discos ordenados
 
     def imprimir_torres(self):
-        """Imprime el estado actual de las torres de Hanoi con caracteres visuales."""
+        """Imprime el estado actual de las torres de Hanoi con los discos numerados."""
         max_disco = self.num_discos
-        # Muestra los discos de las tres torres
+        # Para cada nivel de disco (de mayor a menor)
         for i in range(max_disco, 0, -1):
             for torre in self.torres:
                 if len(torre) >= i:
-                    # Discos visibles representados por '#' o '/' según el tamaño
-                    print(f"{torre[i-1]:<6}", end="   ")
+                    # Muestra el disco con su número entre paréntesis
+                    print(f"{' #' * torre[i-1]} ({torre[i-1]:<2})", end="    ")
                 else:
-                    print("      ", end="   ")  # Espacio adicional para las torres vacías
+                    print("      ", end="    ")  # Espacio para las torres vacías
             print()
-        print("\nA        B        C\n")  # Alinea las torres con más espacio entre ellas
+        print("\n   A              B              C\n")  # Espacio extra entre las torres
 
-    def resolver(self, n, origen, destino, auxiliar):
-        """Resuelve el problema de la Torre de Hanoi de forma recursiva."""
-        if n == 1:
-            self.mover_disco(origen, destino)
-        else:
-            self.resolver(n-1, origen, auxiliar, destino)
-            self.mover_disco(origen, destino)
-            self.resolver(n-1, auxiliar, destino, origen)
+    def es_valido(self, origen, destino):
+        """Verifica si el movimiento es válido. No puede poner un disco más grande sobre uno más pequeño."""
+        if not self.torres[origen]:
+            return False  # La torre de origen está vacía
+        if not self.torres[destino]:
+            return True  # La torre de destino está vacía, por lo que el movimiento es válido
+        # Si el disco de origen es mayor que el disco de destino, no es válido
+        if self.torres[origen][-1] > self.torres[destino][-1]:
+            return False
+        return True
 
     def mover_disco(self, origen, destino):
-        """Mueve un disco de una torre a otra y registra el paso."""
-        disco = self.torres[origen].pop()
-        self.torres[destino].append(disco)
-        self.pasos.append([list(self.torres[0]), list(self.torres[1]), list(self.torres[2])])
+        """Mueve un disco de una torre a otra si el movimiento es válido."""
+        if self.es_valido(origen, destino):
+            disco = self.torres[origen].pop()
+            self.torres[destino].append(disco)
+            return True
+        return False
 
     def jugar(self):
-        """Muestra los pasos de la solución de Torre de Hanoi uno por uno."""
-        # Mostrar el estado inicial
-        self.imprimir_torres()
-        # Resolver el juego
-        self.resolver(self.num_discos, 0, 2, 1)
-
-        # Mostrar los pasos
-        for paso in self.pasos:
-            input("Presiona Enter para ver el siguiente paso...")
-            self.torres = paso  # Actualizar el estado de las torres en cada paso
+        """Ejecuta el juego, permitiendo al usuario mover los discos hasta completar el juego."""
+        while not self.juego_completo():
             self.imprimir_torres()
+
+            try:
+                # Pedir al jugador que elija el disco
+                disco = int(input(f"Escoge un número de disco (1-{self.num_discos}): "))
+                if disco < 1 or disco > self.num_discos:
+                    print("Número de disco inválido, intenta de nuevo.")
+                    continue
+            except ValueError:
+                print("Entrada no válida, intenta de nuevo.")
+                continue
+
+            # Verificar en qué torre está el disco seleccionado
+            encontrado = False
+            for i, torre in enumerate(self.torres):
+                if disco in torre:
+                    origen = ["A", "B", "C"][i]
+                    encontrado = True
+                    break
+            if not encontrado:
+                print(f"El disco #{disco} no está en ninguna torre. Intenta otro.")
+                continue
+
+            # Pedir al jugador que elija la torre de destino
+            destino = input(f"Escoge la torre de destino para mover el disco #{disco} (A, B, C): ").upper()
+            if destino not in ["A", "B", "C"]:
+                print("Opción de torre inválida, intenta de nuevo.")
+                continue
+
+            # Mapear las torres A, B, C a los índices correspondientes (0, 1, 2)
+            origen_index = {"A": 0, "B": 1, "C": 2}[origen]
+            destino_index = {"A": 0, "B": 1, "C": 2}[destino]
+
+            # Intentar mover el disco
+            if self.mover_disco(origen_index, destino_index):
+                print(f"Disco #{disco} movido de la torre {origen} a la torre {destino}.")
+            else:
+                print(f"Movimiento inválido. No se puede mover el disco #{disco} allí.")
+
+        # Mostrar el estado final
+        self.imprimir_torres()
+        print("¡Juego finalizado! Todos los discos están correctamente apilados en la torre C.")
+
+    def juego_completo(self):
+        """Verifica si el juego ha terminado (todos los discos en la torre C)."""
+        return len(self.torres[2]) == self.num_discos and self.torres[2] == list(range(1, self.num_discos + 1))
 
 # Ejecutar el juego con 3 discos
 if __name__ == "__main__":
