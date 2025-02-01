@@ -204,7 +204,7 @@ class Centro_Recreacion:
         self.entry_white.delete(0, tk.END)  # Limpiar la visualización de la fila
         messagebox.showinfo("Reinicio", "El proceso ha sido reiniciado.")
 
-
+##
 if __name__ == "__main__":
     root = tk.Tk()
     app = Centro_Recreacion(root)
