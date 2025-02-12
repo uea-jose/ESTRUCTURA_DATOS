@@ -23,22 +23,24 @@ def obtener_usuarios(cantidad):
         # Agregar los usuarios seleccionados a la lista
         for usuario in usuarios_seleccionados:
             # Nombre
-            lista_usuarios.insert(tk.END, "Nombre: ")
-            lista_usuarios.insert(tk.END, f"{usuario['name']}\n", 'normal')  # Texto normal
+            lista_usuarios.insert(tk.END, "Nombre: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['name']}\n", 'etiqueta_despues')
 
             # Email
-            lista_usuarios.insert(tk.END, "Email: ")
-            lista_usuarios.insert(tk.END, f"{usuario['email']}\n", 'normal')
+            lista_usuarios.insert(tk.END, "Email: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['email']}\n", 'etiqueta_despues')
 
             # Sitio web
-            lista_usuarios.insert(tk.END, "Sitio web: ")
-            lista_usuarios.insert(tk.END, f"{usuario['website']}\n", 'normal')
+            lista_usuarios.insert(tk.END, "Sitio web: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['website']}\n", 'etiqueta_despues')
 
             # Compañía
-            lista_usuarios.insert(tk.END, "Compañía: ")
-            lista_usuarios.insert(tk.END, f"{usuario['company']['name']}\n", 'normal')
-            lista_usuarios.insert(tk.END, f"  Slogan: {usuario['company']['catchPhrase']}\n", 'normal')
-            lista_usuarios.insert(tk.END, f"  Negocios: {usuario['company']['bs']}\n", 'normal')
+            lista_usuarios.insert(tk.END, "Compañía: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['company']['name']}\n", 'etiqueta_despues')
+            lista_usuarios.insert(tk.END, f"  Slogan: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['company']['catchPhrase']}\n", 'etiqueta_despues')
+            lista_usuarios.insert(tk.END, f"  Negocios: ", 'etiqueta_antes')
+            lista_usuarios.insert(tk.END, f"{usuario['company']['bs']}\n", 'etiqueta_despues')
 
             lista_usuarios.insert(tk.END, "-" * 50 + "\n")
 
@@ -93,11 +95,9 @@ lista_usuarios.pack()
 # Configuración de la barra de desplazamiento
 scrollbar.config(command=lista_usuarios.yview)
 
-# Agregar etiquetas de negrita para los encabezados
-lista_usuarios.tag_configure('normal', font=('Arial', 10))  # Normal font
-lista_usuarios.tag_configure('bold', font=('Arial', 10, 'bold'))  # Negrita
+# Agregar etiquetas para colores personalizados
+lista_usuarios.tag_configure('etiqueta_antes', foreground='blue', font=('Arial', 10, 'bold'))  # Antes de ":"
+lista_usuarios.tag_configure('etiqueta_despues', foreground='green', font=('Arial', 10))  # Después de ":"
 
 # Ejecutar la ventana principal
 ventana.mainloop()
-
-
