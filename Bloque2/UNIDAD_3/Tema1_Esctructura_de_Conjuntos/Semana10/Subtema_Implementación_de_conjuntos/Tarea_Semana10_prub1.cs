@@ -1,12 +1,14 @@
-//
-//
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
+// Clase principal que ejecuta el programa
 class Tarea_Semana10
 {
-    static List<string> nombresBase = new List<string>
+    // Conjunto de nombres únicos para evitar duplicados
+    // En esta línea se está aplicando la teoría de conjuntos.
+    // Un conjunto (HashSet) garantiza que no haya nombres repetidos, es decir, cada elemento es único.
+    static HashSet<string> nombresBase = new HashSet<string>
     {
         "Sofía", "Valentina", "María José", "Camila", "Lucía", "Renata", "Valeria", "Josefa", "Ana", "Mía",
         "Gabriela", "María Fernanda", "Violeta", "Elena", "Isabella", "Jimena", "Martina", "Ariana", "Sara",
@@ -16,7 +18,9 @@ class Tarea_Semana10
         "Diego", "Raúl", "Eduardo", "Luis Eduardo", "Estefania", "Fernando", "Ricardo", "Anahi", "Carlos Javier"
     };
 
-    static List<string> apellidosBase = new List<string>
+    // Conjunto de apellidos únicos para evitar duplicados
+    // Similar al conjunto de nombres, el uso de un HashSet garantiza que los apellidos sean únicos.
+    static HashSet<string> apellidosBase = new HashSet<string>
     {
         "Romero", "Martínez", "Pérez", "Rodríguez", "Jiménez", "Díaz", "Ramírez", "Torres", "Reyes", "García",
         "Rojas", "Sánchez", "Morales", "Mendoza", "Avila", "Chávez", "López", "Castro", "Fernández", "Cuenca",
@@ -24,109 +28,76 @@ class Tarea_Semana10
         "Fuentes", "Vega", "San Martin", "Alvarado", "Mora", "Zambrano", "Puga", "Valarezo", "Sotomayor", "Armijos"
     };
 
+    // Método principal que inicia el programa
     static void Main()
     {
+        // Solicita al usuario cuántas personas generar, con un valor por defecto de 500
         Console.Write("¿Cuántas personas deseas generar? (Por defecto: 500): ");
         string entrada = Console.ReadLine();
+
+        // Establece la cantidad de personas a generar, si no se introduce un valor válido, se usa 500
         int cantidad = string.IsNullOrWhiteSpace(entrada) ? 500 : int.TryParse(entrada, out int num) && num > 0 ? num : 500;
 
+        // Generar y mostrar las personas
         var personas = GenerarPersonas(cantidad);
         MostrarPersonas(personas);
     }
 
-    static List<Tuple<string, string, int>> GenerarPersonas(int cantidad)
+    // Método que genera una lista de personas con nombres, tipo de vacuna y dosis
+    static List<(string Nombre, string Vacuna, int Dosis)> GenerarPersonas(int cantidad)
     {
-        var personas = new List<Tuple<string, string, int>>();
         Random rand = new Random();
 
-        // Crear listas separadas
-        var listaPfizer = new List<Tuple<string, string, int>>();
-        var listaAstraZeneca = new List<Tuple<string, string, int>>();
-        var listaSinVacuna = new List<Tuple<string, string, int>>();
+        // Generar nombres aleatorios únicos combinando nombres y apellidos
+        // Aquí utilizas un conjunto de nombres y apellidos (HashSet) y los combinas de manera aleatoria.
+        // El uso de HashSet asegura que no haya duplicados, lo cual es un comportamiento propio de los conjuntos.
+        var nombresCompletos = nombresBase.SelectMany(nombre => apellidosBase,
+            (nombre, apellido) => $"{nombre} {apellido}").OrderBy(_ => rand.Next()).Take(cantidad).ToList();
 
-        // Agregar 75 con Pfizer
-        for (int i = 0; i < 75; i++)
+        // Asignar vacunas usando LINQ y mezclar el resultado
+        var personas = nombresCompletos.Select((nombre, index) =>
         {
-            string nombre = $"{nombresBase[rand.Next(nombresBase.Count)]} {apellidosBase[rand.Next(apellidosBase.Count)]}";
-            listaPfizer.Add(new Tuple<string, string, int>(nombre, "Pfizer", 2));
-        }
-
-        // Agregar 75 con AstraZeneca
-        for (int i = 0; i < 75; i++)
-        {
-            string nombre = $"{nombresBase[rand.Next(nombresBase.Count)]} {apellidosBase[rand.Next(apellidosBase.Count)]}";
-            listaAstraZeneca.Add(new Tuple<string, string, int>(nombre, "AstraZeneca", 2));
-        }
-
-        // Agregar el resto sin vacunar
-        for (int i = 150; i < cantidad; i++)
-        {
-            string nombre = $"{nombresBase[rand.Next(nombresBase.Count)]} {apellidosBase[rand.Next(apellidosBase.Count)]}";
-            listaSinVacuna.Add(new Tuple<string, string, int>(nombre, "Sin Vacuna", 0));
-        }
-
-        // Mezclar las listas
-        personas.AddRange(listaPfizer);
-        personas.AddRange(listaAstraZeneca);
-        personas.AddRange(listaSinVacuna);
-        personas = personas.OrderBy(x => rand.Next()).ToList();
+            string vacuna = index < 75 ? "Pfizer" : index < 150 ? "AstraZeneca" : "Sin Vacuna";
+            int dosis = vacuna == "Sin Vacuna" ? 0 : 2;
+            return (nombre, vacuna, dosis);
+        }).OrderBy(_ => rand.Next()).ToList(); // Mezclar aleatoriamente
 
         return personas;
     }
 
-    static void MostrarPersonas(List<Tuple<string, string, int>> personas)
+    // Método para mostrar las personas generadas en formato tabular en consola
+    static void MostrarPersonas(List<(string Nombre, string Vacuna, int Dosis)> personas)
     {
+        // Imprimir encabezados de la tabla
         Console.WriteLine("{0,-30} {1,-20} {2,-10}", "Nombre", "Tipo Vacuna", "No. Dosis");
         Console.WriteLine("--------------------------------------------------------------");
 
-        // Contadores
-        int totalPfizer = 0;
-        int totalAstraZeneca = 0;
-        int totalSinVacuna = 0;
-
-        foreach (var persona in personas)
+        // Iterar sobre cada persona y mostrar sus datos con colores según el tipo de vacuna
+        personas.ForEach(persona =>
         {
-            string color = persona.Item2 switch
+            // Cambiar el color de la consola según el tipo de vacuna
+            Console.ForegroundColor = persona.Vacuna switch
             {
-                "Pfizer" => "Azul",
-                "AstraZeneca" => "Amarillo",
-                "Sin Vacuna" => "Gris",
-                _ => "Sin color"
-            };
-
-            Console.ForegroundColor = color switch
-            {
-                "Azul" => ConsoleColor.Cyan,
-                "Amarillo" => ConsoleColor.Yellow,
-                "Gris" => ConsoleColor.Gray,
+                "Pfizer" => ConsoleColor.Cyan,      // Color cian para Pfizer
+                "AstraZeneca" => ConsoleColor.Yellow, // Color amarillo para AstraZeneca
+                "Sin Vacuna" => ConsoleColor.Gray,  // Color gris para Sin Vacuna
                 _ => ConsoleColor.White
             };
+            // Mostrar la información de la persona
+            Console.WriteLine("{0,-30} {1,-20} {2,-10}", persona.Nombre, persona.Vacuna, persona.Dosis);
+        });
 
-            Console.WriteLine("{0,-30} {1,-20} {2,-10}", persona.Item1, persona.Item2, persona.Item3);
+        // Restablecer el color de la consola a su valor predeterminado
+        Console.ResetColor(); 
 
-            // Contadores para los totales
-            if (persona.Item2 == "Pfizer") totalPfizer++;
-            else if (persona.Item2 == "AstraZeneca") totalAstraZeneca++;
-            else if (persona.Item2 == "Sin Vacuna") totalSinVacuna++;
-        }
-
-        Console.ResetColor();
-
-        // Mostrar totales
+        // Mostrar totales de cada tipo de vacuna
         Console.WriteLine("--------------------------------------------------------------");
-        
-        // Pfizer en color Cyan
         Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"Total vacunados Pfizer (2 dosis): {totalPfizer}");
-        
-        // AstraZeneca en color Amarillo
+        Console.WriteLine($"Total vacunados Pfizer (2 dosis): {personas.Count(p => p.Vacuna == "Pfizer")}");
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"Total vacunados AstraZeneca (2 dosis): {totalAstraZeneca}");
-        
-        // Sin Vacuna en color Gris
+        Console.WriteLine($"Total vacunados AstraZeneca (2 dosis): {personas.Count(p => p.Vacuna == "AstraZeneca")}");
         Console.ForegroundColor = ConsoleColor.Gray;
-        Console.WriteLine($"Total Sin vacunar: {totalSinVacuna}");
-
-        Console.ResetColor();
+        Console.WriteLine($"Total Sin vacunar: {personas.Count(p => p.Vacuna == "Sin Vacuna")}");
+        Console.ResetColor(); // Restablecer color de la consola
     }
 }
