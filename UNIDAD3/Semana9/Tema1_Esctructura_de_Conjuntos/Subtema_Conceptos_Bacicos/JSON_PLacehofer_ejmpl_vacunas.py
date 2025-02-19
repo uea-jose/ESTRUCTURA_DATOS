@@ -15,7 +15,7 @@ vacunas = ["Pfizer", "AstraZeneca", "Sin Vacuna"]  # Lista con los tipos de vacu
 def generar_personas(cantidad):
     for row in tree.get_children():
         tree.delete(row)
-
+#
     personas = []
     for _ in range(cantidad):
         nombre = f"{random.choice(nombres_base)} {random.choice(apellidos_base)}"
@@ -111,5 +111,8 @@ tree.config(yscrollcommand=scrollbar.set)
 tree.tag_configure("pfizer", background="#A7D8F2")  # Azul claro para Pfizer
 tree.tag_configure("astrazeneca", background="#F3E7C1")  # Amarillo claro para AstraZeneca
 tree.tag_configure("sin_vacuna", background="#D3D3D3")  # Gris claro para personas no vacunadas
+
+# Vincular la tecla Enter a la función mostrar_personas
+ventana.bind("<Return>", mostrar_personas)
 
 ventana.mainloop()
