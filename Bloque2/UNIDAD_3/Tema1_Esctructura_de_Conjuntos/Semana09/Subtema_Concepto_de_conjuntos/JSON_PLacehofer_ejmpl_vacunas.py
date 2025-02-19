@@ -1,3 +1,4 @@
+#
 import tkinter as tk  # Importa la biblioteca tkinter para crear interfaces gráficas.
 from tkinter import messagebox  # Importa el módulo messagebox para mostrar mensajes de alerta o información.
 from tkinter import ttk  # Importa el módulo ttk (Themed Tkinter) para acceder a widgets como Treeview.
