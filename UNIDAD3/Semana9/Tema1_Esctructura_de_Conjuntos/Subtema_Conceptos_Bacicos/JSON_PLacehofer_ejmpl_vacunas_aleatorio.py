@@ -26,7 +26,7 @@ vacunas = ["Pfizer", "AstraZeneca", "Sin Vacuna"]  # Tipos de vacuna
 def generar_personas(cantidad):
     for row in tree.get_children():
         tree.delete(row)
-
+#
     personas = []
     for _ in range(cantidad):
         nombre = f"{random.choice(nombres_base)} {random.choice(apellidos_base)}"
