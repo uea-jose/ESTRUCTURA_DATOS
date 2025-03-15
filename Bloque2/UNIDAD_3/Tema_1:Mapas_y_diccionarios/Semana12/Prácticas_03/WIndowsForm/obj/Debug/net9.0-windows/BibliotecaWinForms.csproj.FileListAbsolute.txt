@@ -1,0 +1,14 @@
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.AssemblyInfoInputs.cache
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.AssemblyInfo.cs
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.csproj.CoreCompileInputs.cache
+C:\Users\tefy\BibliotecaWinForms\bin\Debug\net9.0-windows\BibliotecaWinForms.exe
+C:\Users\tefy\BibliotecaWinForms\bin\Debug\net9.0-windows\BibliotecaWinForms.deps.json
+C:\Users\tefy\BibliotecaWinForms\bin\Debug\net9.0-windows\BibliotecaWinForms.runtimeconfig.json
+C:\Users\tefy\BibliotecaWinForms\bin\Debug\net9.0-windows\BibliotecaWinForms.dll
+C:\Users\tefy\BibliotecaWinForms\bin\Debug\net9.0-windows\BibliotecaWinForms.pdb
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.dll
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\refint\BibliotecaWinForms.dll
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.pdb
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\BibliotecaWinForms.genruntimeconfig.cache
+C:\Users\tefy\BibliotecaWinForms\obj\Debug\net9.0-windows\ref\BibliotecaWinForms.dll

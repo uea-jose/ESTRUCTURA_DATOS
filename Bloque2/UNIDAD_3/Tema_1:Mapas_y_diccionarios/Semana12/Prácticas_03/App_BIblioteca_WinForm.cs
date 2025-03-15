@@ -1,187 +1,244 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
-public class Libro
+namespace BibliotecaWinForms
 {
-    // Propiedades del libro
-    public string ISBN { get; set; }
-    public string Titulo { get; set; }
-    public string Autor { get; set; }
-    public int AnioPublicacion { get; set; }
-    public string Categoria { get; set; }
-
-    // Constructor que inicializa las propiedades
-    public Libro(string isbn, string titulo, string autor, int anio, string categoria)
+    public partial class Form1 : Form
     {
-        ISBN = isbn;
-        Titulo = titulo;
-        Autor = autor;
-        AnioPublicacion = anio;
-        Categoria = categoria;
-    }
-}
+        private HashSet<string> categorias;
+        private ArbolBinario libros;
 
-public class Nodo
-{
-    // Nodo del árbol binario, que contiene un libro y sus nodos izquierdo y derecho
-    public Libro Libro;
-    public Nodo Izquierda, Derecha;
-
-    // Constructor del nodo
-    public Nodo(Libro libro)
-    {
-        Libro = libro;
-        Izquierda = Derecha = null;
-    }
-}
-
-public class ArbolLibros
-{
-    private Nodo raiz;
-
-    // Método público para insertar un libro en el árbol
-    public void Insertar(Libro libro)
-    {
-        raiz = InsertarRec(raiz, libro);
-    }
-
-    // Método privado recursivo para insertar el libro en el árbol binario
-    private Nodo InsertarRec(Nodo nodo, Libro libro)
-    {
-        // Si el nodo es nulo, se crea un nuevo nodo
-        if (nodo == null) return new Nodo(libro);
-
-        // Compara el título del libro y decide si insertarlo en la izquierda o en la derecha
-        if (string.Compare(libro.Titulo, nodo.Libro.Titulo) < 0)
-            nodo.Izquierda = InsertarRec(nodo.Izquierda, libro);
-        else
-            nodo.Derecha = InsertarRec(nodo.Derecha, libro);
-
-        return nodo;
-    }
-
-    // Método público para buscar un libro por su título
-    public Libro Buscar(string titulo)
-    {
-        return BuscarRec(raiz, titulo);
-    }
-
-    // Método privado recursivo para buscar un libro en el árbol binario
-    private Libro BuscarRec(Nodo nodo, string titulo)
-    {
-        if (nodo == null) return null;
-
-        // Si se encuentra el libro, se devuelve
-        if (titulo == nodo.Libro.Titulo) return nodo.Libro;
-
-        // Si no se encuentra, se busca en la rama correspondiente
-        return string.Compare(titulo, nodo.Libro.Titulo) < 0 ?
-            BuscarRec(nodo.Izquierda, titulo) : BuscarRec(nodo.Derecha, titulo);
-    }
-
-    // Método público para eliminar un libro por su título
-    public void Eliminar(string titulo)
-    {
-        raiz = EliminarRec(raiz, titulo);
-    }
-
-    // Método privado recursivo para eliminar un libro en el árbol binario
-    private Nodo EliminarRec(Nodo nodo, string titulo)
-    {
-        if (nodo == null) return null;
-
-        // Se compara el título y se navega por el árbol
-        if (string.Compare(titulo, nodo.Libro.Titulo) < 0)
-            nodo.Izquierda = EliminarRec(nodo.Izquierda, titulo);
-        else if (string.Compare(titulo, nodo.Libro.Titulo) > 0)
-            nodo.Derecha = EliminarRec(nodo.Derecha, titulo);
-        else
+        public Form1()
         {
-            // Caso de un nodo sin hijos o con un solo hijo
-            if (nodo.Izquierda == null) return nodo.Derecha;
-            else if (nodo.Derecha == null) return nodo.Izquierda;
-
-            // Caso de un nodo con dos hijos
-            Nodo minNodo = ObtenerMin(nodo.Derecha);
-            nodo.Libro = minNodo.Libro;
-            nodo.Derecha = EliminarRec(nodo.Derecha, minNodo.Libro.Titulo);
+            InitializeComponent();
+            InicializarCategorias();
+            libros = new ArbolBinario(); // Árbol binario para almacenar libros
+            buttonAgregar.Click += new EventHandler(buttonAgregar_Click);
+            buttonEliminar.Click += new EventHandler(buttonEliminar_Click);
         }
 
-        return nodo;
+        private void InicializarCategorias()
+        {
+            // Se usa un HashSet para evitar duplicados en las categorías
+            categorias = new HashSet<string> { "Ficción", "Novela", "Drama", "Juvenil" };
+            comboBoxCategoria.Items.AddRange(categorias.ToArray());
+        }
+
+        private void buttonAgregar_Click(object sender, EventArgs e)
+        {
+            if (comboBoxCategoria.SelectedItem == null ||
+                string.IsNullOrWhiteSpace(textBoxISBN.Text) ||
+                string.IsNullOrWhiteSpace(textBoxTitulo.Text) ||
+                string.IsNullOrWhiteSpace(textBoxAutor.Text) ||
+                string.IsNullOrWhiteSpace(textBoxAnio.Text))
+            {
+                MessageBox.Show("Todos los campos deben estar llenos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (!int.TryParse(textBoxAnio.Text, out int anio))
+            {
+                MessageBox.Show("Ingrese un año válido.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Verificar si el ISBN ya existe
+            if (libros.Existe(textBoxISBN.Text))
+            {
+                MessageBox.Show("El libro con este ISBN ya existe.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Crear un nuevo libro con los datos ingresados
+            Libro nuevoLibro = new Libro(
+                comboBoxCategoria.SelectedItem.ToString(),
+                textBoxISBN.Text,
+                textBoxTitulo.Text,
+                textBoxAutor.Text,
+                anio);
+
+            libros.Insertar(nuevoLibro); // Insertar en el árbol binario
+            ActualizarDataGridView();
+        }
+
+        private void buttonEliminar_Click(object sender, EventArgs e)
+        {
+            if (dataGridViewLibros.SelectedRows.Count > 0)
+            {
+                var isbnsSeleccionados = dataGridViewLibros.SelectedRows
+                                        .Cast<DataGridViewRow>()
+                                        .Select(row => row.Cells[1].Value.ToString())
+                                        .ToList();
+
+                foreach (string isbn in isbnsSeleccionados)
+                {
+                    libros.Eliminar(isbn); // Eliminar del árbol binario
+                }
+
+                ActualizarDataGridView();
+            }
+            else
+            {
+                MessageBox.Show("Seleccione un libro para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void ActualizarDataGridView()
+        {
+            dataGridViewLibros.Rows.Clear();
+
+            var librosOrdenados = libros.ObtenerListaOrdenada()
+                                        .OrderBy(libro => libro.Categoria)
+                                        .ThenBy(libro => libro.Anio)
+                                        .ToList();
+
+            foreach (var libro in librosOrdenados)
+            {
+                dataGridViewLibros.Rows.Add(libro.Categoria, libro.ISBN, libro.Titulo, libro.Autor, libro.Anio);
+            }
+        }
     }
 
-    // Método para obtener el nodo con el valor mínimo (más a la izquierda)
-    private Nodo ObtenerMin(Nodo nodo)
+    public class Libro
     {
-        while (nodo.Izquierda != null)
-            nodo = nodo.Izquierda;
+        public string Categoria { get; set; }
+        public string ISBN { get; set; }
+        public string Titulo { get; set; }
+        public string Autor { get; set; }
+        public int Anio { get; set; }
 
-        return nodo;
+        public Libro(string categoria, string isbn, string titulo, string autor, int anio)
+        {
+            Categoria = categoria;
+            ISBN = isbn;
+            Titulo = titulo;
+            Autor = autor;
+            Anio = anio;
+        }
+    }
+
+    public class Nodo
+    {
+        public Libro Datos;
+        public Nodo Izquierdo, Derecho;
+
+        public Nodo(Libro datos)
+        {
+            Datos = datos;
+            Izquierdo = Derecho = null;
+        }
+    }
+
+    public class ArbolBinario
+    {
+        private Nodo raiz;
+
+        public ArbolBinario()
+        {
+            raiz = null;
+        }
+
+        public void Insertar(Libro nuevoLibro)
+        {
+            raiz = InsertarRecursivo(raiz, nuevoLibro);
+        }
+
+        private Nodo InsertarRecursivo(Nodo actual, Libro nuevoLibro)
+        {
+            if (actual == null)
+            {
+                return new Nodo(nuevoLibro);
+            }
+
+            if (string.Compare(nuevoLibro.ISBN, actual.Datos.ISBN) < 0)
+            {
+                actual.Izquierdo = InsertarRecursivo(actual.Izquierdo, nuevoLibro);
+            }
+            else
+            {
+                actual.Derecho = InsertarRecursivo(actual.Derecho, nuevoLibro);
+            }
+
+            return actual;
+        }
+
+        public void Eliminar(string isbn)
+        {
+            raiz = EliminarRecursivo(raiz, isbn);
+        }
+
+        private Nodo EliminarRecursivo(Nodo actual, string isbn)
+        {
+            if (actual == null)
+            {
+                return actual;
+            }
+
+            if (string.Compare(isbn, actual.Datos.ISBN) < 0)
+            {
+                actual.Izquierdo = EliminarRecursivo(actual.Izquierdo, isbn);
+            }
+            else if (string.Compare(isbn, actual.Datos.ISBN) > 0)
+            {
+                actual.Derecho = EliminarRecursivo(actual.Derecho, isbn);
+            }
+            else
+            {
+                if (actual.Izquierdo == null)
+                {
+                    return actual.Derecho;
+                }
+                else if (actual.Derecho == null)
+                {
+                    return actual.Izquierdo;
+                }
+                
+                Nodo sucesor = ObtenerMinimo(actual.Derecho);
+                actual.Datos = sucesor.Datos;
+                actual.Derecho = EliminarRecursivo(actual.Derecho, sucesor.Datos.ISBN);
+            }
+            return actual;
+        }
+
+        private Nodo ObtenerMinimo(Nodo actual)
+        {
+            while (actual.Izquierdo != null)
+            {
+                actual = actual.Izquierdo;
+            }
+            return actual;
+        }
+
+        public List<Libro> ObtenerListaOrdenada()
+        {
+            List<Libro> lista = new List<Libro>();
+            InOrden(raiz, lista);
+            return lista;
+        }
+
+        private void InOrden(Nodo actual, List<Libro> lista)
+        {
+            if (actual != null)
+            {
+                InOrden(actual.Izquierdo, lista);
+                lista.Add(actual.Datos);
+                InOrden(actual.Derecho, lista);
+            }
+        }
+
+        public bool Existe(string isbn)
+        {
+            return Buscar(raiz, isbn) != null;
+        }
+
+        private Nodo Buscar(Nodo actual, string isbn)
+        {
+            if (actual == null) return null;
+            int comparacion = string.Compare(isbn, actual.Datos.ISBN);
+            if (comparacion == 0) return actual;
+            return comparacion < 0 ? Buscar(actual.Izquierdo, isbn) : Buscar(actual.Derecho, isbn);
+        }
     }
 }
-
-public class BibliotecaApp : Form
-{
-    private ArbolLibros arbol = new ArbolLibros();
-    private ComboBox categoriaCombo;
-    private TextBox isbnTextBox, tituloTextBox, autorTextBox, anioTextBox;
-    private DataGridView dataGridView;
-    private Label mensajeError;
-
-    // Constructor de la aplicación, se configuran los controles de la interfaz
-    public BibliotecaApp()
-    {
-        Text = "Biblioteca";
-        Size = new System.Drawing.Size(600, 400);
-
-        // Configuración del formulario
-        FlowLayoutPanel panel = new FlowLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(10) };
-        Controls.Add(panel);
-
-        // Etiqueta para mensajes de error
-        mensajeError = new Label { ForeColor = System.Drawing.Color.Red };
-        panel.Controls.Add(mensajeError);
-
-        // Añadir la etiqueta y ComboBox para seleccionar la categoría
-        Label categoriaLabel = new Label { Text = "Categoría" };
-        panel.Controls.Add(categoriaLabel);
-
-        categoriaCombo = new ComboBox();
-        categoriaCombo.Items.Add("Novela");
-        categoriaCombo.Items.Add("Ficción");
-        categoriaCombo.Items.Add("Drama");
-        categoriaCombo.Items.Add("Juvenil");
-        panel.Controls.Add(categoriaCombo);
-
-        // Crear campos de texto para ISBN, Título, Autor y Año
-        panel.Controls.Add(CrearCampo("ISBN:", out isbnTextBox));
-        panel.Controls.Add(CrearCampo("Título:", out tituloTextBox));
-        panel.Controls.Add(CrearCampo("Autor:", out autorTextBox));
-        panel.Controls.Add(CrearCampo("Año:", out anioTextBox));
-
-        // Botón para agregar un libro
-        Button agregarButton = new Button { Text = "Agregar Libro" };
-        agregarButton.Click += AgregarLibro;
-        panel.Controls.Add(agregarButton);
-
-        // Botón para eliminar un libro
-        Button eliminarButton = new Button { Text = "Eliminar Libro" };
-        eliminarButton.Click += EliminarLibro;
-        panel.Controls.Add(eliminarButton);
-
-        // DataGridView para mostrar la lista de libros
-        dataGridView = new DataGridView { Dock = DockStyle.Fill, AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill };
-        dataGridView.Columns.Add("ISBN", "ISBN");
-        dataGridView.Columns.Add("Título", "Título");
-        dataGridView.Columns.Add("Autor", "Autor");
-        dataGridView.Columns.Add("Año", "Año");
-        dataGridView.Columns.Add("Categoría", "Categoría");
-        panel.Controls.Add(dataGridView);
-    }
-
-    // Método para crear los campos de texto con una etiqueta
-    private FlowLayoutPanel CrearCampo(string labelText, out TextBox textBox)
-    {
-        FlowLayoutPanel flowPanel = new FlowLayoutPanel();
-        Label label = new Label { Text = labelText };
-        textBox = new Tex
